@@ -40,7 +40,7 @@ process.on("uncaughtException", (err) => {
 // using middlewares
 app.use(
   cors({
-    origin: [/netlify\.app$/, /localhost:\d{4}$/],
+    origin: ["https://marque-blanche-ecommerce-admin-main.vercel.app"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
