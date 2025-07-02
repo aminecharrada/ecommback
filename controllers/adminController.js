@@ -9,6 +9,7 @@ exports.registerAdmin = catchAsyncError(async (req, res, next) => {
   console.log(req.body);
   const { name, email, password, privilege } = req.body;
   if (!name || !email || !password) {
+    console.log("Missing fields detected");
     return next(new ErrorHandler("Missing fields", 400));
   }
   const admin = await Admin.create({
@@ -17,6 +18,7 @@ exports.registerAdmin = catchAsyncError(async (req, res, next) => {
     privilege,
     password,
   });
+  console.log("Admin created:", admin);
   res.status(200).json({
     success: true,
     data: {
@@ -28,23 +30,27 @@ exports.registerAdmin = catchAsyncError(async (req, res, next) => {
   });
 });
 exports.loginAdmin = async (req, res, next) => {
-
+  console.log("Login Request Body:", req.body);
   const { email, password } = req.body;
   
   // console.log('email:', email);
   // console.log('password:', password);
 
     if (!email || !password) {
+      console.log("Login failed: Missing email/password");
       return next(new ErrorHandler('Missing fields', 400));
     }
     const admin = await Admin.findOne({ email }).select('+password');
     if (!admin) {
+      console.log("Login failed: Admin not found for email:", email);
       return next(new ErrorHandler('Invalid email or password', 401));
     }
     const isPasswordMatched = await admin.comparePassword(password);
     if (!isPasswordMatched) {
+      console.log("Login failed: Password mismatch for email:", email);
       return next(new ErrorHandler('Invalid email or password', 401));
     }
+    console.log("Login successful for admin ID:", admin._id);
     sendToken(admin, 200, res);
   
 
@@ -119,14 +125,19 @@ exports.getSingleAdminDetails = catchAsyncError(async (req, res, next) => {
 
 exports.sendCurrentUser = catchAsyncError(async (req, res, next) => {
   const { token } = req.cookies;
+  console.log("Token from cookies:", token); // Log the received token
   if (!token) {
+    console.log("No token found in cookies");
     return next(new ErrorHandler("User not found", 400));
   }
   const decodedData = await jwt.verify(token, process.env.JWT_SECRET);
+  console.log("Decoded Token Data:", decodedData); // Log decoded JWT payload
   const admin = await Admin.findById(decodedData.id);
   if (!admin) {
+    console.log("Admin not found for ID:", decodedData.id);
     new ErrorHandler("User not found", 401);
   }
+  console.log("Current user fetched:", admin.email);
   sendToken(admin, 200, res);
 });
 
