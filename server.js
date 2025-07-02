@@ -40,8 +40,11 @@ process.on("uncaughtException", (err) => {
 // using middlewares
 app.use(
   cors({
-    origin: ["https://marque-blanche-ecommerce-admin-main.vercel.app"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: [
+      "https://marque-blanche-ecommerce-admin-main.vercel.app",
+      "https://marque-blanche-ecommerce-admin-main_vercel.app" // Add this variant
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Add OPTIONS
     credentials: true,
   })
 );
